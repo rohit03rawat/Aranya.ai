@@ -140,6 +140,8 @@ if __name__ == '__main__':
     api_working = test_gemini_api()
     if api_working:
         print("API test successful, starting Flask app...")
-        app.run(debug=True, port=5000)
+        port = int(os.environ.get("PORT", 5000))
+        app.run(host="0.0.0.0", port=port, debug=True)
+
     else:
         print("API test failed. Please check your API key and internet connection.")
