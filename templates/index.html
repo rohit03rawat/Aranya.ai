@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Support Chat</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .chat-container {
+            height: calc(100vh - 180px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            max-width: 80%;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+        }
+        .user-message {
+            background-color: #E3F2FD;
+            color: #1565C0;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .bot-message {
+            background-color: #F5F5F5;
+            color: #424242;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background-color: #F5F5F5;
+            padding: 10px 15px;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #808080;
+            animation: bounce 1.4s infinite ease-in-out;
+            margin-right: 3px;
+        }
+        .dot:nth-child(1) { animation-delay: 0s; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
+        <div class="bg-white rounded-lg shadow-lg p-4">
+            <div class="flex items-center justify-between mb-4 p-2 border-b">
+                <h1 class="text-2xl font-semibold text-blue-600">Mental Health Support</h1>
+                <button id="newConversationBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                    New Conversation
+                </button>
+            </div>
+            
+            <div id="chatContainer" class="chat-container p-4">
+                <div class="bot-message message">
+                    Hello! I'm here to provide emotional support and guidance. How are you feeling today?
+                </div>
+                <div class="typing-indicator" id="typingIndicator">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t">
+                <form id="messageForm" class="flex">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        class="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        placeholder="Type your message here..."
+                        autocomplete="off"
+                    >
+                    <button 
+                        type="submit" 
+                        class="bg-blue-500 text-white px-6 py-3 rounded-r-lg hover:bg-blue-600 transition-colors"
+                    >
+                        Send
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-sm text-gray-600 text-center">
+            <p>This is not a substitute for professional mental health services. If you're in crisis, please call 988 or text HOME to 741741.</p>
+        </div>
+    </div>
+
+    <script>
+        // Generate a unique user ID or get from local storage
+        let userId = localStorage.getItem('chatUserId');
+        if (!userId) {
+            userId = 'user_' + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('chatUserId', userId);
+        }
+        
+        // DOM elements
+        const chatContainer = document.getElementById('chatContainer');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const newConversationBtn = document.getElementById('newConversationBtn');
+        
+        // Load chat history when the page loads
+        window.addEventListener('DOMContentLoaded', loadChatHistory);
+        
+        // Form submission handler
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessageToChat(message, true);
+            messageInput.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            try {
+                // Send message to API
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                // Add bot response to chat
+                if (data.response) {
+                    addMessageToChat(data.response, false);
+                } else {
+                    addMessageToChat("I'm sorry, I'm having trouble responding right now.", false);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                hideTypingIndicator();
+                addMessageToChat("I'm having technical difficulties. Please try again later.", false);
+            }
+        });
+        
+        // New conversation button handler
+        newConversationBtn.addEventListener('click', () => {
+            if (confirm("Start a new conversation? This will clear the current chat.")) {
+                clearChat();
+                addMessageToChat("Hello! I'm here to provide emotional support and guidance. How are you feeling today?", false);
+            }
+        });
+        
+        // Function to add a message to the chat
+        function addMessageToChat(message, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+            
+            // Convert URLs to links and handle line breaks
+            const formattedMessage = message
+                .replace(/https?:\/\/[^\s]+/g, url => `<a href="${url}" target="_blank" class="text-blue-600 underline">${url}</a>`)
+                .replace(/\n/g, '<br>');
+            
+            messageDiv.innerHTML = formattedMessage;
+            
+            // Insert before typing indicator
+            chatContainer.insertBefore(messageDiv, typingIndicator);
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Show typing indicator
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+        
+        // Clear chat messages
+        function clearChat() {
+            while (chatContainer.firstChild) {
+                chatContainer.removeChild(chatContainer.firstChild);
+            }
+            chatContainer.appendChild(typingIndicator);
+        }
+        
+        // Load chat history
+        async function loadChatHistory() {
+            try {
+                const response = await fetch(`/api/history?user_id=${userId}`);
+                const data = await response.json();
+                
+                if (data.history && data.history.length > 0) {
+                    clearChat();
+                    
+                    data.history.forEach(msg => {
+                        addMessageToChat(msg.content, !msg.is_bot);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading chat history:', error);
+            }
+        }
+    </script>
+</body>
+</html>
