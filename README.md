@@ -4,6 +4,7 @@
 
 A supportive mental health chatbot built with Flask and Google's Gemini API (gemini-2.0-flash), designed to provide emotional support and coping strategies. Hosted using Render.
 
+Live Demo - https://aranya-ai.onrender.com
 ---
 
 ## 💡 Features
