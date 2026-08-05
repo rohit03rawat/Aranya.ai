@@ -2,8 +2,10 @@ import os
 import json
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
-import google.generativeai as genai
 from dotenv import load_dotenv
+from google import genai
+
+
 
 # Load environment variables
 load_dotenv()
@@ -13,16 +15,17 @@ app = Flask(__name__)
 
 # Configure Google Gemini API
 api_key = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=api_key)
 
-# Initialize Gemini model
-model = genai.GenerativeModel('gemini-2.0-flash')
+# Only run this block for Gemini Developer API
+client = genai.Client(api_key=api_key)
 
 # Store conversation history
 conversations = {}
 
 def create_system_prompt():
+
     """Create the system prompt for the therapy chatbot"""
+
     return """You are a supportive mental health chatbot designed to provide emotional support, 
     coping strategies, and general guidance. You are NOT a licensed therapist or medical professional.
     
@@ -91,7 +94,8 @@ def generate_response(user_id, message):
     
     try:
         print("Sending simplified request to Gemini API...")
-        response = model.generate_content(final_prompt)
+        response = client.models.generate_content(model='gemini-3.1-flash-lite',
+                                                  contents=final_prompt)
         bot_response = response.text
         print(f"Received response: {bot_response[:50]}...")  # Print first 50 chars
         
@@ -128,7 +132,8 @@ def chat():
 def test_gemini_api():
     try:
         # Use the existing model instance
-        response = model.generate_content("Hello, can you give me a short response to test if you're working?")
+        response = client.models.generate_content(model='gemini-3.1-flash-lite',
+                                                  contents="Hello, can you give me a short response to test if you're working?")
         print("API Test successful! Received:", response.text)
         return True
     except Exception as e:
