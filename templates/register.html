@@ -1,81 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Mental Health Support</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7f2" />
+    {% include "_theme_init.html" %}
+    <title>Create account · Aranya</title>
     <style>
-        body {
-            background-color: #f8f9fa;
-            padding-top: 60px;
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .btn-primary {
-            background-color: #6c63ff;
-            border-color: #6c63ff;
-        }
-        .btn-primary:hover {
-            background-color: #5a52d9;
-            border-color: #5a52d9;
-        }
-        .form-container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        .logo {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .logo h1 {
-            color: #6c63ff;
-        }
+      :root { color-scheme: light; --page:#f5f7f2; --surface:#fff; --text:#24332d; --muted:#77847d; --line:#e4eae4; --accent:#477b64; --soft:#e8f1eb; }
+      * { box-sizing:border-box; }
+      body { min-height:100vh; margin:0; display:grid; place-items:center; padding:24px; background:radial-gradient(ellipse at 15% 5%,#dbe9db,transparent 32rem),var(--page); color:var(--text); font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+      a { color:var(--accent); }
+      .card { width:min(100%,460px); padding:clamp(26px,6vw,42px); border:1px solid var(--line); border-radius:24px; background:var(--surface); box-shadow:0 24px 70px #30443712; }
+      .brand { display:flex; align-items:center; gap:10px; margin-bottom:32px; color:var(--text); font-size:1.12rem; font-weight:700; text-decoration:none; }
+      .mark { display:grid; width:38px; height:38px; place-items:center; border-radius:13px; background:var(--soft); color:var(--accent); }
+      h1 { margin:0; font:500 clamp(1.9rem,5vw,2.4rem)/1.15 Georgia,serif; letter-spacing:-.04em; }
+      .intro { margin:10px 0 26px; color:var(--muted); }
+      label { display:block; margin:15px 0 6px; font-size:.88rem; font-weight:650; }
+      input { width:100%; min-height:48px; padding:10px 13px; border:1px solid var(--line); border-radius:12px; background:#fff; color:var(--text); font:inherit; }
+      input:focus { outline:3px solid #477b6422; border-color:var(--accent); }
+      button { width:100%; min-height:48px; margin-top:22px; border:0; border-radius:12px; background:var(--accent); color:white; font:inherit; font-weight:650; cursor:pointer; }
+      button:hover { background:#386a54; }
+      .error { margin:18px 0 0; padding:12px 14px; border:1px solid #efc9c5; border-radius:12px; background:#fff4f2; color:#873f38; }
+      .foot { margin:23px 0 0; color:var(--muted); text-align:center; font-size:.9rem; }
+      .foot a { font-weight:650; }
+      .privacy { margin:15px 0 0; color:var(--muted); font-size:.77rem; line-height:1.55; }
+      .brand-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; }
+      .brand-row .brand { margin:0; }
     </style>
-</head>
-<body>
-    <div class="container form-container">
-        <div class="logo">
-            <h1>Mental Health Support</h1>
-            <p class="text-muted">Your safe space to talk</p>
-        </div>
-        <div class="card p-4">
-            <h2 class="text-center mb-4">Register</h2>
-            
-            {% if error %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
-            </div>
-            {% endif %}
-            
-            <form action="/register" method="POST">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Full Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
-                <div class="mb-3">
-                    <label for="confirm_password" class="form-label">Confirm Password</label>
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
-                </div>
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary">Register</button>
-                </div>
-            </form>
-            <div class="mt-3 text-center">
-                <p>Already have an account? <a href="/login">Login</a></p>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+  </head>
+  <body>
+    <main class="card">
+      <div class="brand-row">
+        <a class="brand" href="/">
+          <span class="mark" aria-hidden="true">✳</span><span>aranya</span>
+        </a>
+        {% include "_theme_toggle.html" %}
+      </div>
+      <h1>A space of your own.</h1>
+      <p class="intro">Create an account to save your conversations and return when you’re ready.</p>
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+      <form method="post" action="{{ url_for('register') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" autocomplete="name" maxlength="100" required />
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required />
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required />
+        <label for="confirm_password">Confirm password</label>
+        <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required />
+        <button type="submit">Create account</button>
+      </form>
+      <p class="privacy">Your conversations may include sensitive information. Only sign up if you’re comfortable storing them in your account. You can manage your profile summary at any time.</p>
+      <p class="foot">Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+    </main>
+  </body>
 </html>

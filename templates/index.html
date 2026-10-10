@@ -3,247 +3,981 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mental Health Support Chat</title>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
-      rel="stylesheet"
-    />
+    <meta name="theme-color" content="#f5f7f2" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>Aranya — a little space to talk</title>
+    {% include "_theme_init.html" %}
     <style>
-      .chat-container {
-        height: calc(100vh - 320px);
-        overflow-y: auto;
+      :root {
+        color-scheme: light;
+        --page: #f5f7f2;
+        --surface: #ffffff;
+        --surface-muted: #f8faf7;
+        --text: #24332d;
+        --muted: #77847d;
+        --line: #e8ede8;
+        --accent: #477b64;
+        --accent-hover: #386a54;
+        --accent-soft: #e8f1eb;
+        --user-bubble: #e5f0e8;
+        --bot-bubble: #f3f5f2;
+        --shadow: 0 24px 70px rgba(48, 68, 55, 0.10), 0 3px 10px rgba(48, 68, 55, 0.04);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 32px 20px 24px;
+        background:
+          radial-gradient(ellipse at 14% 4%, rgba(211, 229, 215, 0.58), transparent 34rem),
+          radial-gradient(ellipse at 94% 90%, rgba(228, 232, 211, 0.48), transparent 30rem),
+          var(--page);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        transition: background-color 180ms ease, color 180ms ease;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        color: inherit;
+      }
+
+      .app-shell {
+        width: min(100%, 980px);
+        margin: 0 auto;
+      }
+
+      .topbar {
         display: flex;
-        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 auto 24px;
+        padding: 0 4px;
       }
-      .message {
-        max-width: 80%;
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        color: var(--text);
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+        border-radius: 13px;
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .brand-mark svg {
+        width: 21px;
+        height: 21px;
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .account-menu {
+        position: relative;
+      }
+
+      .account-menu summary {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        gap: 8px;
+        padding: 0 10px 0 6px;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 650;
+        list-style: none;
+      }
+
+      .account-menu summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .account-menu summary::after {
+        width: 7px;
+        height: 7px;
+        border-right: 1.5px solid var(--muted);
+        border-bottom: 1.5px solid var(--muted);
+        content: "";
+        transform: translateY(-2px) rotate(45deg);
+      }
+
+      .account-menu[open] summary,
+      .account-menu summary:hover {
+        border-color: var(--accent);
+        background: var(--surface-muted);
+      }
+
+      .account-avatar {
+        display: grid;
+        width: 29px;
+        height: 29px;
+        place-items: center;
+        border-radius: 10px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 0.78rem;
+        font-weight: 750;
+      }
+
+      .account-popover {
+        position: absolute;
+        z-index: 5;
+        top: calc(100% + 8px);
+        right: 0;
+        display: grid;
+        width: 180px;
+        gap: 3px;
+        padding: 7px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .account-popover a,
+      .account-popover button {
+        display: block;
+        width: 100%;
+        padding: 9px 10px;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.85rem;
+        text-align: left;
+        text-decoration: none;
+      }
+
+      .account-popover a:hover,
+      .account-popover button:hover {
+        background: var(--surface-muted);
+        color: var(--accent);
+      }
+
+      .account-popover form {
+        margin: 0;
+      }
+
+      .account-popover .menu-divider {
+        height: 1px;
+        margin: 4px 5px;
+        background: var(--line);
+      }
+
+      .icon-button,
+      .new-chat-button {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+        transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+      }
+
+      .icon-button {
+        width: 42px;
+      }
+
+      .new-chat-button {
+        padding: 0 14px;
+        color: var(--muted);
+        font-size: 0.87rem;
+        font-weight: 600;
+      }
+
+      .icon-button:hover,
+      .new-chat-button:hover {
+        border-color: var(--accent);
+        background: var(--surface-muted);
+      }
+
+      .icon-button:active,
+      .new-chat-button:active {
+        transform: translateY(1px);
+      }
+
+      .icon-button svg,
+      .new-chat-button svg,
+      .send-button svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .intro {
+        margin: 0 0 21px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
         margin-bottom: 10px;
-        padding: 10px 15px;
-        border-radius: 18px;
-        line-height: 1.4;
+        color: var(--accent);
+        font-size: 0.73rem;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
       }
-      .user-message {
-        background-color: #e3f2fd;
-        color: #1565c0;
-        align-self: flex-end;
-        border-bottom-right-radius: 4px;
+
+      .eyebrow-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-soft);
       }
+
+      .intro h1 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(2rem, 4vw, 2.75rem);
+        font-weight: 500;
+        letter-spacing: -0.055em;
+        line-height: 1.13;
+      }
+
+      .intro p {
+        max-width: 440px;
+        margin: 11px auto 0;
+        color: var(--muted);
+        font-size: 0.96rem;
+        line-height: 1.6;
+      }
+
+      .chat-card {
+        overflow: hidden;
+        border: 1px solid color-mix(in srgb, var(--line) 90%, transparent);
+        border-radius: 22px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .chat-heading {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 70px;
+        padding: 15px 24px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .assistant-avatar {
+        display: grid;
+        width: 39px;
+        height: 39px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 14px;
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .assistant-avatar svg {
+        width: 21px;
+        height: 21px;
+      }
+
+      .assistant-details {
+        min-width: 0;
+      }
+
+      .assistant-details strong {
+        display: block;
+        font-size: 0.92rem;
+        font-weight: 650;
+      }
+
+      .assistant-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 0.77rem;
+      }
+
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #75aa83;
+      }
+
+      .chat-container {
+        display: flex;
+        height: min(52vh, 470px);
+        min-height: 300px;
+        flex-direction: column;
+        gap: 13px;
+        overflow-y: auto;
+        padding: 26px clamp(17px, 5vw, 42px);
+        scroll-behavior: smooth;
+      }
+
+      .message {
+        max-width: min(78%, 620px);
+        padding: 13px 16px;
+        border-radius: 17px;
+        font-size: 0.94rem;
+        line-height: 1.65;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+        animation: message-in 220ms ease-out both;
+      }
+
       .bot-message {
-        background-color: #f5f5f5;
-        color: #424242;
         align-self: flex-start;
-        border-bottom-left-radius: 4px;
+        border: 1px solid var(--line);
+        border-bottom-left-radius: 5px;
+        background: var(--bot-bubble);
+        color: var(--text);
       }
+
+      .user-message {
+        align-self: flex-end;
+        border-bottom-right-radius: 5px;
+        background: var(--user-bubble);
+        color: var(--text);
+      }
+
+      .message a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
       .typing-indicator {
         display: none;
         align-self: flex-start;
-        background-color: #f5f5f5;
-        padding: 10px 15px;
-        border-radius: 18px;
-        border-bottom-left-radius: 4px;
-        margin-bottom: 10px;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        border-bottom-left-radius: 5px;
+        background: var(--bot-bubble);
       }
+
       .dot {
         display: inline-block;
-        width: 8px;
-        height: 8px;
+        width: 7px;
+        height: 7px;
+        margin: 0 2px;
         border-radius: 50%;
-        background-color: #808080;
-        animation: bounce 1.4s infinite ease-in-out;
-        margin-right: 3px;
+        background: var(--muted);
+        animation: bounce 1.3s infinite ease-in-out;
       }
-      .dot:nth-child(1) {
-        animation-delay: 0s;
-      }
+
       .dot:nth-child(2) {
-        animation-delay: 0.2s;
+        animation-delay: 0.16s;
       }
+
       .dot:nth-child(3) {
-        animation-delay: 0.4s;
+        animation-delay: 0.32s;
       }
+
+      .composer-wrap {
+        padding: 17px clamp(16px, 4vw, 32px) 20px;
+        border-top: 1px solid var(--line);
+        background: var(--surface);
+      }
+
+      .composer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 58px;
+        padding: 6px 7px 6px 17px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--surface-muted);
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+      }
+
+      .composer:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+      }
+
+      .composer input {
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--text);
+        font-size: 0.94rem;
+      }
+
+      .composer input::placeholder {
+        color: var(--muted);
+        opacity: 0.85;
+      }
+
+      .send-button {
+        display: inline-flex;
+        min-width: 46px;
+        min-height: 44px;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 12px;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        font-size: 0.88rem;
+        font-weight: 650;
+        transition: background-color 160ms ease, transform 160ms ease;
+      }
+
+      :root[data-theme="dark"] .send-button {
+        color: #142019;
+      }
+
+      .send-button:hover {
+        background: var(--accent-hover);
+      }
+
+      .send-button:active {
+        transform: translateY(1px);
+      }
+
+      .composer-hint {
+        margin: 9px 2px 0;
+        color: var(--muted);
+        font-size: 0.73rem;
+        text-align: center;
+      }
+
+      .disclaimer {
+        max-width: 680px;
+        margin: 17px auto 0;
+        color: var(--muted);
+        font-size: 0.76rem;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      .disclaimer strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .disclaimer a {
+        color: var(--accent);
+        font-weight: 650;
+        text-decoration: none;
+        text-underline-offset: 2px;
+      }
+
+      .disclaimer a:hover {
+        text-decoration: underline;
+      }
+
+      .quota-notice {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 0 auto 14px;
+        color: var(--muted);
+        font-size: 0.82rem;
+        text-align: center;
+      }
+
+      .quota-notice button {
+        min-height: 34px;
+        padding: 0 12px;
+        border: 1px solid var(--accent);
+        border-radius: 10px;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 650;
+      }
+
+      .quota-notice button:disabled {
+        border-color: var(--line);
+        background: var(--surface-muted);
+        color: var(--muted);
+        cursor: not-allowed;
+      }
+
+      .quota-notice[hidden] {
+        display: none;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        clip-path: inset(50%);
+      }
+
       @keyframes bounce {
-        0%,
-        80%,
-        100% {
-          transform: scale(0);
+        0%, 80%, 100% {
+          transform: scale(0.65);
+          opacity: 0.55;
         }
         40% {
           transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      @keyframes message-in {
+        from {
+          transform: translateY(5px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 18px 12px 17px;
+        }
+
+        .topbar {
+          margin-bottom: 21px;
+        }
+
+        .brand {
+          gap: 8px;
+          font-size: 1rem;
+        }
+
+        .brand-mark {
+          width: 35px;
+          height: 35px;
+          border-radius: 12px;
+        }
+
+        .new-chat-button {
+          width: 42px;
+          min-width: 42px;
+          padding: 0;
+          font-size: 0;
+        }
+
+        .new-chat-button svg {
+          flex: 0 0 auto;
+        }
+
+        .topbar-actions {
+          gap: 7px;
+        }
+
+        .account-menu summary {
+          width: 42px;
+          justify-content: center;
+          padding: 0;
+        }
+
+        .account-menu summary::after {
+          display: none;
+        }
+
+        .account-menu summary > span:not(.account-avatar) {
+          display: none;
+        }
+
+        .intro {
+          margin-bottom: 18px;
+        }
+
+        .intro p {
+          max-width: 340px;
+          font-size: 0.9rem;
+        }
+
+        .chat-card {
+          border-radius: 18px;
+        }
+
+        .chat-heading {
+          min-height: 64px;
+          padding: 12px 16px;
+        }
+
+        .chat-container {
+          height: min(54vh, 470px);
+          min-height: 270px;
+          padding: 19px 15px;
+        }
+
+        .message {
+          max-width: 88%;
+          padding: 11px 13px;
+          font-size: 0.9rem;
+        }
+
+        .composer-wrap {
+          padding: 13px 13px 16px;
+        }
+
+        .composer {
+          min-height: 54px;
+          padding-left: 13px;
+        }
+
+        .send-button {
+          min-height: 42px;
+          padding: 0 12px;
+        }
+
+        .disclaimer {
+          font-size: 0.72rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
         }
       }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
   </head>
-  <body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-8 max-w-2xl">
-      <div class="bg-white rounded-lg shadow-lg p-4">
-        <div class="flex items-center justify-between mb-4 p-2 border-b">
-          <h1 class="text-2xl font-semibold text-blue-600">
-            Mental Health Support
-          </h1>
-          <button
-            id="newConversationBtn"
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
-            New Conversation
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Aranya home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20V10" />
+              <path d="M12 13c-4.2 0-6.4-2.2-6.4-6.4C9.8 6.6 12 8.8 12 13Z" />
+              <path d="M12 16c0-4.2 2.2-6.4 6.4-6.4C18.4 13.8 16.2 16 12 16Z" />
+            </svg>
+          </span>
+          <span>aranya</span>
+        </a>
+        <div class="topbar-actions">
+          {% include "_theme_toggle.html" %}
+          <details class="account-menu">
+            <summary aria-label="Open account menu">
+              <span class="account-avatar" aria-hidden="true">{{ user.name[0]|upper }}</span>
+              <span>{{ user.name }}</span>
+            </summary>
+            <nav class="account-popover" aria-label="Account menu">
+              <a href="{{ url_for('history_page') }}">Conversation history</a>
+              <a href="{{ url_for('profile_page') }}">Your profile</a>
+              <span class="menu-divider" aria-hidden="true"></span>
+              <form method="post" action="{{ url_for('logout') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit">Sign out</button>
+              </form>
+            </nav>
+          </details>
+          <button class="new-chat-button" id="newConversationBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            New conversation
           </button>
         </div>
+      </header>
 
-        <div id="chatContainer" class="chat-container p-4">
-          <div class="bot-message message">
-            Hello! I'm here to provide emotional support and guidance. How are
-            you feeling today?
+      <section class="intro" aria-labelledby="pageTitle">
+        <div class="eyebrow"><span class="eyebrow-dot"></span>A calmer corner of the internet</div>
+        <h1 id="pageTitle">A little space to talk.</h1>
+        <p>Take a breath. Share what’s on your mind, at your own pace. I’m here to listen.</p>
+      </section>
+
+      <div class="quota-notice" id="quotaNotice" aria-live="polite">
+        <span id="quotaStatus">{{ free_messages_remaining }} free messages left · {{ paid_credits }} paid credits</span>
+        <button id="buyCreditsButton" type="button" {% if not payment_enabled %}disabled title="Credit checkout will be available once Razorpay is configured."{% endif %}>
+          {% if payment_enabled %}Buy {{ credit_pack_messages }} messages · ₹{{ credit_pack_price_rupees }}{% else %}Purchases not configured{% endif %}
+        </button>
+      </div>
+
+      <section class="chat-card" aria-label="Support conversation">
+        <div class="chat-heading">
+          <div class="assistant-avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v2m0 14v2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42M3 12h2m14 0h2M5.64 18.36l1.42-1.42m9.88-9.88 1.42-1.42" />
+              <circle cx="12" cy="12" r="4" />
+            </svg>
           </div>
-          <div class="typing-indicator" id="typingIndicator">
+          <div class="assistant-details">
+            <strong>Your support companion</strong>
+            <span class="assistant-status"><span class="status-dot"></span>Here with you</span>
+          </div>
+        </div>
+
+        <div id="chatContainer" class="chat-container" aria-live="polite" aria-label="Conversation messages">
+          <div class="bot-message message">
+            Hello! I’m here to provide emotional support and guidance. How are you feeling today?
+          </div>
+          <div class="typing-indicator" id="typingIndicator" aria-label="Assistant is typing">
             <span class="dot"></span>
             <span class="dot"></span>
             <span class="dot"></span>
           </div>
         </div>
 
-        <div class="p-4 border-t">
-          <form id="messageForm" class="flex">
+        <div class="composer-wrap">
+          <form id="messageForm" class="composer">
+            <label class="sr-only" for="messageInput">Your message</label>
             <input
               type="text"
               id="messageInput"
-              class="flex-grow min-w-0 p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Type your message here..."
+              placeholder="Write what’s on your mind..."
               autocomplete="off"
+              aria-label="Write what’s on your mind"
             />
-            <button
-              type="submit"
-              class="bg-blue-500 text-white px-6 py-3 rounded-r-lg hover:bg-blue-600 transition-colors"
-            >
-              Send
+            <button class="send-button" type="submit" aria-label="Send message">
+              <span>Send</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m22 2-7 20-4-9-9-4 20-7ZM22 2 11 13" />
+              </svg>
             </button>
           </form>
+          <p class="composer-hint">A gentle reminder: you can share as much or as little as you like.</p>
         </div>
-      </div>
+      </section>
 
-      <div class="mt-4 text-sm text-gray-600 text-center">
-        <p>
-          This is not a substitute for professional mental health services. If
-          you're in crisis, please call TELE-MANAS on 14416 or 1800 891 4416.
-        </p>
-      </div>
-    </div>
+      <p class="disclaimer">
+        <strong>A note on care:</strong> Aranya isn’t a substitute for professional mental health support.
+        If you’re in crisis, call <a href="tel:14416">TELE-MANAS at 14416</a> or
+        <a href="tel:18008914416">1800 891 4416</a>.
+      </p>
+    </main>
 
+    {% if payment_enabled %}
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    {% endif %}
     <script>
-      // Generate a unique user ID or get from local storage
-      let userId = localStorage.getItem("chatUserId");
-      if (!userId) {
-        userId = "user_" + Math.random().toString(36).substring(2, 15);
-        localStorage.setItem("chatUserId", userId);
-      }
-
-      // DOM elements
+      const conversationId = {{ conversation_id|tojson }};
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+      let freeMessagesRemaining = {{ free_messages_remaining }};
+      let paidCredits = {{ paid_credits }};
       const chatContainer = document.getElementById("chatContainer");
       const messageForm = document.getElementById("messageForm");
       const messageInput = document.getElementById("messageInput");
       const typingIndicator = document.getElementById("typingIndicator");
       const newConversationBtn = document.getElementById("newConversationBtn");
+      const quotaStatus = document.getElementById("quotaStatus");
+      const buyCreditsButton = document.getElementById("buyCreditsButton");
+      const purchaseButtonLabel = buyCreditsButton.textContent.trim();
+      const sendButton = messageForm.querySelector('button[type="submit"]');
 
-      // Load chat history when the page loads
+      function resetPurchaseButton() {
+        buyCreditsButton.disabled = false;
+        buyCreditsButton.textContent = purchaseButtonLabel;
+      }
+
+      function updateQuota() {
+        quotaStatus.textContent =
+          `${freeMessagesRemaining} free messages left · ${paidCredits} paid credits`;
+        messageInput.disabled = freeMessagesRemaining === 0 && paidCredits === 0;
+        sendButton.disabled = messageInput.disabled;
+        if (messageInput.disabled) {
+          messageInput.placeholder = "Your message limit is reached. Add credits to continue.";
+        }
+      }
+
       window.addEventListener("DOMContentLoaded", loadChatHistory);
 
-      // Form submission handler
       messageForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+        if (sendButton.disabled) return;
         const message = messageInput.value.trim();
         if (!message) return;
 
-        // Add user message to chat
         addMessageToChat(message, true);
         messageInput.value = "";
-
-        // Show typing indicator
+        sendButton.disabled = true;
         showTypingIndicator();
 
         try {
-          // Send message to API
           const response = await fetch("/api/chat", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "X-CSRF-Token": csrfToken,
             },
             body: JSON.stringify({
-              user_id: userId,
+              conversation_id: conversationId,
               message: message,
             }),
           });
 
           const data = await response.json();
-
-          // Hide typing indicator
           hideTypingIndicator();
 
-          // Add bot response to chat
-          if (data.response) {
+          if (response.ok && data.response) {
             addMessageToChat(data.response, false);
+            freeMessagesRemaining = data.free_messages_remaining;
+            paidCredits = data.paid_credits;
+            updateQuota();
+          } else if (data.code === "limit_reached") {
+            addMessageToChat(data.error, false);
+            freeMessagesRemaining = 0;
+            paidCredits = 0;
+            updateQuota();
           } else {
-            addMessageToChat(
-              "I'm sorry, I'm having trouble responding right now.",
-              false,
-            );
+            addMessageToChat(data.error || "I’m sorry, I’m having trouble responding right now.", false);
+            updateQuota();
           }
         } catch (error) {
           console.error("Error:", error);
           hideTypingIndicator();
           addMessageToChat(
-            "I'm having technical difficulties. Please try again later.",
+            "I’m having technical difficulties. Please try again later.",
             false,
           );
+        } finally {
+          updateQuota();
         }
       });
 
-      // New conversation button handler
       newConversationBtn.addEventListener("click", () => {
         if (
-          confirm("Start a new conversation? This will clear the current chat.")
+          confirm("Start a new conversation? Your current conversation will remain in History.")
         ) {
-          clearChat();
-          addMessageToChat(
-            "Hello! I'm here to provide emotional support and guidance. How are you feeling today?",
-            false,
-          );
+          window.location.href = "/chat";
         }
       });
 
-      // Function to add a message to the chat
+      buyCreditsButton.addEventListener("click", async () => {
+        if (buyCreditsButton.disabled) return;
+        buyCreditsButton.disabled = true;
+        buyCreditsButton.textContent = "Opening checkout…";
+        try {
+          const orderResponse = await fetch("/api/credits/order", {
+            method: "POST",
+            headers: { "X-CSRF-Token": csrfToken },
+          });
+          const order = await orderResponse.json();
+          if (!orderResponse.ok) throw new Error(order.error || "Could not start checkout.");
+          const checkout = new Razorpay({
+            key: order.key_id,
+            amount: order.amount,
+            currency: order.currency,
+            name: "Aranya",
+            description: `${order.credits} chat messages`,
+            order_id: order.order_id,
+            handler: async (payment) => {
+              const verifyResponse = await fetch("/api/credits/verify", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-CSRF-Token": csrfToken,
+                },
+                body: JSON.stringify(payment),
+              });
+              const result = await verifyResponse.json();
+              if (!verifyResponse.ok) {
+                alert(result.error || "Payment verification failed. Please contact support.");
+                resetPurchaseButton();
+                return;
+              }
+              paidCredits += result.credits_added;
+              updateQuota();
+              resetPurchaseButton();
+              alert("Payment complete. Your chat credits are ready.");
+            },
+            modal: {
+              ondismiss: () => {
+                resetPurchaseButton();
+              },
+            },
+            theme: { color: "#477b64" },
+          });
+          checkout.open();
+        } catch (error) {
+          alert(error.message || "Could not open checkout. Please try again.");
+          resetPurchaseButton();
+        }
+      });
+
+      function appendTextWithLinks(container, text) {
+        const parts = text.split(/(https?:\/\/[^\s]+)/g);
+        parts.forEach((part) => {
+          if (/^https?:\/\//i.test(part)) {
+            const link = document.createElement("a");
+            link.href = part;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = part;
+            container.appendChild(link);
+          } else {
+            container.appendChild(document.createTextNode(part));
+          }
+        });
+      }
+
       function addMessageToChat(message, isUser) {
         const messageDiv = document.createElement("div");
-        messageDiv.classList.add("message");
-        messageDiv.classList.add(isUser ? "user-message" : "bot-message");
-
-        // Convert URLs to links and handle line breaks
-        const formattedMessage = message
-          .replace(
-            /https?:\/\/[^\s]+/g,
-            (url) =>
-              `<a href="${url}" target="_blank" class="text-blue-600 underline">${url}</a>`,
-          )
-          .replace(/\n/g, "<br>");
-
-        messageDiv.innerHTML = formattedMessage;
-
-        // Insert before typing indicator
+        messageDiv.classList.add("message", isUser ? "user-message" : "bot-message");
+        appendTextWithLinks(messageDiv, message);
         chatContainer.insertBefore(messageDiv, typingIndicator);
-
-        // Scroll to bottom
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
 
-      // Show typing indicator
       function showTypingIndicator() {
         typingIndicator.style.display = "block";
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
 
-      // Hide typing indicator
       function hideTypingIndicator() {
         typingIndicator.style.display = "none";
       }
 
-      // Clear chat messages
       function clearChat() {
         while (chatContainer.firstChild) {
           chatContainer.removeChild(chatContainer.firstChild);
@@ -251,23 +985,24 @@
         chatContainer.appendChild(typingIndicator);
       }
 
-      // Load chat history
       async function loadChatHistory() {
         try {
-          const response = await fetch(`/api/history?user_id=${userId}`);
+          const response = await fetch(`/api/history?conversation_id=${encodeURIComponent(conversationId)}`);
+          if (!response.ok) throw new Error("Could not load this conversation.");
           const data = await response.json();
 
           if (data.history && data.history.length > 0) {
             clearChat();
-
             data.history.forEach((msg) => {
-              addMessageToChat(msg.content, !msg.is_bot);
+              addMessageToChat(msg.content, msg.role === "user");
             });
           }
         } catch (error) {
           console.error("Error loading chat history:", error);
         }
       }
+
+      updateQuota();
     </script>
   </body>
 </html>

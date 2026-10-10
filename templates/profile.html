@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7f2" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>Your profile · Aranya</title>
+    {% include "_theme_init.html" %}
+    <style>
+      :root { --page:#f5f7f2; --surface:#fff; --text:#24332d; --muted:#77847d; --line:#e5ebe5; --accent:#477b64; --soft:#e8f1eb; }
+      * { box-sizing:border-box; }
+      body { min-height:100vh; margin:0; padding:24px 16px 50px; background:radial-gradient(ellipse at 15% 5%,#dce9dc,transparent 32rem),var(--page); color:var(--text); font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+      .shell { width:min(700px,100%); margin:auto; }
+      header { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:38px; }
+      .brand { color:var(--text); font-size:1.08rem; font-weight:750; text-decoration:none; }
+      .links { display:flex; gap:16px; }
+      .links a,.back { color:var(--accent); font-weight:650; text-decoration:none; }
+      h1 { margin:0; font:500 clamp(2.2rem,6vw,3rem)/1.1 Georgia,serif; letter-spacing:-.045em; }
+      .intro { margin:10px 0 23px; color:var(--muted); }
+      .card { padding:clamp(20px,5vw,32px); border:1px solid var(--line); border-radius:20px; background:var(--surface); }
+      .identity { margin:0 0 26px; padding-bottom:18px; border-bottom:1px solid var(--line); }
+      .identity span { display:block; color:var(--muted); font-size:.82rem; }
+      .identity strong { display:block; margin-top:3px; font-size:1.02rem; }
+      label { display:block; margin-bottom:7px; font-size:.91rem; font-weight:700; }
+      .helper { margin:0 0 12px; color:var(--muted); font-size:.85rem; }
+      textarea { width:100%; min-height:180px; resize:vertical; padding:13px; border:1px solid var(--line); border-radius:13px; color:var(--text); font:inherit; line-height:1.55; }
+      textarea:focus { outline:3px solid #477b6422; border-color:var(--accent); }
+      .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+      button { min-height:43px; padding:0 15px; border:1px solid var(--accent); border-radius:11px; background:var(--accent); color:#fff; font:inherit; font-size:.88rem; font-weight:650; cursor:pointer; }
+      button:hover { background:#386a54; }
+      button.secondary { border-color:var(--line); background:var(--surface); color:var(--text); }
+      button:disabled { opacity:.65; cursor:wait; }
+      .notice { margin:18px 0; padding:12px 14px; border-radius:12px; background:var(--soft); color:#385945; font-size:.87rem; }
+      .error { background:#fff4f2; color:#873f38; }
+      .flash { margin:0 0 14px; padding:12px 14px; border-radius:12px; background:var(--soft); color:#385945; font-size:.87rem; }
+      .privacy { margin:18px 0 0; color:var(--muted); font-size:.79rem; line-height:1.6; }
+      @media (max-width:520px) { header { align-items:flex-start; flex-direction:column; } }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <a class="brand" href="/">✳ aranya</a>
+        <nav class="links" aria-label="Account navigation">
+          <a href="{{ url_for('history_page') }}">History</a>
+          <a href="{{ url_for('chat_page') }}">Chat</a>
+          {% include "_theme_toggle.html" %}
+        </nav>
+      </header>
+      <h1>Your profile.</h1>
+      <p class="intro">Keep a few things you want your companion to remember about you.</p>
+      {% with messages = get_flashed_messages() %}
+        {% for message in messages %}<p class="flash" role="status">{{ message }}</p>{% endfor %}
+      {% endwith %}
+      <section class="card">
+        <div class="identity">
+          <span>Name</span><strong>{{ user.name }}</strong>
+          <span style="margin-top:10px">Email</span><strong>{{ user.email }}</strong>
+        </div>
+        <label for="profileSummary">Your support profile</label>
+        <p class="helper">This is optional. You can write it yourself, ask for a draft based on your chats, or leave it empty.</p>
+        <div id="draftNotice" class="notice" role="status" hidden></div>
+        <form method="post" action="{{ url_for('save_profile') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <textarea id="profileSummary" name="profile_summary" maxlength="2000" placeholder="For example: I’ve been feeling overwhelmed at work. A short walk and talking to my sister usually help.">{{ user.profile_summary }}</textarea>
+          <div class="actions">
+            <button type="submit">Save profile</button>
+            <button class="secondary" id="draftButton" type="button">Draft from my conversations</button>
+          </div>
+        </form>
+        <p class="privacy">A draft is created only when you click the button above. It is not saved until you review it and choose “Save profile.” It will not make a diagnosis. You can edit or clear this field at any time; clearing and saving deletes the summary.</p>
+      </section>
+      <p style="margin-top:22px"><a class="back" href="{{ url_for('history_page') }}">← Back to history</a></p>
+    </main>
+    <script>
+      const draftButton = document.getElementById("draftButton");
+      const draftNotice = document.getElementById("draftNotice");
+      const profileSummary = document.getElementById("profileSummary");
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+      draftButton.addEventListener("click", async () => {
+        draftButton.disabled = true;
+        draftButton.textContent = "Preparing your draft…";
+        draftNotice.hidden = false;
+        draftNotice.classList.remove("error");
+        draftNotice.textContent = "Creating a draft from the conversations saved to your account. Review it before saving.";
+        try {
+          const response = await fetch("/api/profile/draft", {
+            method: "POST",
+            headers: { "X-CSRF-Token": csrfToken },
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || "Could not create a draft.");
+          profileSummary.value = result.draft;
+          draftNotice.textContent = "Draft ready. Review or edit it above, then save it if you want to keep it.";
+          profileSummary.focus();
+        } catch (error) {
+          draftNotice.classList.add("error");
+          draftNotice.textContent = error.message || "Could not create a draft. Please try again.";
+        } finally {
+          draftButton.disabled = false;
+          draftButton.textContent = "Draft from my conversations";
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,318 +1,145 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mental Health Support - Your Safe Space</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f7f2" />
+    {% include "_theme_init.html" %}
+    <title>Aranya · A little space to talk</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        .navbar {
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        .navbar-brand {
-            color: #6c63ff;
-            font-weight: bold;
-        }
-        .nav-link {
-            color: #555;
-            font-weight: 500;
-        }
-        .btn-primary {
-            background-color: #6c63ff;
-            border-color: #6c63ff;
-        }
-        .btn-primary:hover {
-            background-color: #5a52d9;
-            border-color: #5a52d9;
-        }
-        .btn-outline-primary {
-            color: #6c63ff;
-            border-color: #6c63ff;
-        }
-        .btn-outline-primary:hover {
-            background-color: #6c63ff;
-            color: white;
-        }
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-        .btn-success:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
-        }
-        .hero {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 80px 0;
-            border-radius: 0 0 30px 30px;
-        }
-        .hero h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            color: #333;
-        }
-        .hero p {
-            font-size: 1.2rem;
-            color: #666;
-        }
-        .feature-card {
-            background-color: white;
-            border-radius: 15px;
-            border: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            height: 100%;
-            transition: transform 0.3s;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-        .feature-icon {
-            font-size: 2.5rem;
-            color: #6c63ff;
-            margin-bottom: 15px;
-        }
-        .testimonial {
-            background-color: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-        }
-        .testimonial-text {
-            font-style: italic;
-            color: #555;
-        }
-        .testimonial-author {
-            font-weight: 600;
-            margin-top: 15px;
-        }
-        .cta-section {
-            background-color: #6c63ff;
-            color: white;
-            padding: 60px 0;
-            border-radius: 30px;
-            margin: 40px 0;
-        }
-        footer {
-            background-color: #f8f9fa;
-            padding: 40px 0 20px;
-            border-top: 1px solid #e0e0e0;
-        }
-        .social-icon {
-            font-size: 1.5rem;
-            color: #6c63ff;
-            margin-right: 15px;
-        }
+      :root { --page:#f5f7f2; --surface:#fff; --text:#24332d; --muted:#77847d; --line:#e5ebe5; --accent:#477b64; --soft:#e8f1eb; }
+      * { box-sizing:border-box; }
+      html { scroll-behavior:smooth; }
+      body { margin:0; background:radial-gradient(ellipse at 12% 5%,#dce9dc,transparent 34rem),radial-gradient(ellipse at 92% 80%,#e9ead9,transparent 29rem),var(--page); color:var(--text); font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+      a { color:inherit; }
+      .wrap { width:min(1120px,calc(100% - 40px)); margin:auto; }
+      header { display:flex; min-height:82px; align-items:center; justify-content:space-between; gap:24px; }
+      .brand { display:flex; align-items:center; gap:10px; font-size:1.1rem; font-weight:750; letter-spacing:-.04em; text-decoration:none; }
+      .mark { display:grid; width:38px; height:38px; place-items:center; border:1px solid #477b6433; border-radius:13px; background:var(--soft); color:var(--accent); }
+      nav { display:flex; align-items:center; gap:22px; }
+      nav a { color:var(--muted); font-size:.9rem; font-weight:550; text-decoration:none; }
+      nav a:hover { color:var(--accent); }
+      .button { display:inline-flex; min-height:46px; align-items:center; justify-content:center; padding:0 18px; border:1px solid var(--accent); border-radius:13px; background:var(--accent); color:#fff; font-size:.91rem; font-weight:650; text-decoration:none; transition:transform .15s,background .15s; }
+      .button:hover { transform:translateY(-1px); background:#386a54; }
+      .button.secondary { border-color:var(--line); background:var(--surface); color:var(--text); }
+      .hero { display:grid; min-height:590px; grid-template-columns:1.1fr .9fr; align-items:center; gap:58px; padding:68px 0 82px; }
+      .eyebrow { display:inline-flex; align-items:center; gap:9px; color:var(--accent); font-size:.76rem; font-weight:750; letter-spacing:.12em; text-transform:uppercase; }
+      .dot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 5px var(--soft); }
+      h1,h2 { font-family:Georgia,"Times New Roman",serif; font-weight:500; letter-spacing:-.055em; }
+      h1 { max-width:650px; margin:21px 0 18px; font-size:clamp(3.1rem,7vw,5.5rem); line-height:1.02; }
+      .hero p { max-width:540px; margin:0; color:var(--muted); font-size:1.08rem; line-height:1.75; }
+      .hero-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:30px; }
+      .note { max-width:480px!important; margin-top:20px!important; font-size:.79rem!important; }
+      .art { position:relative; display:grid; min-height:365px; place-items:center; }
+      .orb { position:relative; display:grid; width:min(330px,76vw); aspect-ratio:1; place-items:center; border:1px solid #477b6426; border-radius:46% 54% 65% 35% / 40% 45% 55% 60%; background:linear-gradient(145deg,#e5efe5,#f8f7e9); box-shadow:0 28px 75px #30443715; transform:rotate(-7deg); }
+      .orb:before,.orb:after { position:absolute; content:""; border:1px solid #477b6430; border-radius:50%; }
+      .orb:before { inset:27px; }
+      .orb:after { inset:56px; }
+      .leaf { z-index:1; color:var(--accent); font-size:6.8rem; transform:rotate(7deg); }
+      .bubble { position:absolute; padding:13px 17px; border:1px solid var(--line); border-radius:17px; background:#ffffffed; box-shadow:0 10px 30px #3044370c; color:#53645a; font-size:.88rem; }
+      .bubble.one { top:50px; left:0; }
+      .bubble.two { right:-10px; bottom:44px; }
+      section.content { padding:70px 0; }
+      .section-head { max-width:620px; margin:0 auto 36px; text-align:center; }
+      h2 { margin:0; font-size:clamp(2.2rem,4vw,3.2rem); line-height:1.12; }
+      .section-head p { color:var(--muted); }
+      .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:17px; }
+      .card { padding:25px; border:1px solid var(--line); border-radius:19px; background:var(--surface); }
+      .icon { display:grid; width:43px; height:43px; place-items:center; border-radius:14px; background:var(--soft); color:var(--accent); font-size:1.15rem; }
+      .card h3 { margin:17px 0 7px; font-size:1.04rem; }
+      .card p { margin:0; color:var(--muted); font-size:.92rem; }
+      .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:36px; }
+      .step { border-top:1px solid #cbd7cc; padding-top:17px; }
+      .step b { color:var(--accent); font-size:.78rem; letter-spacing:.1em; }
+      .step h3 { margin:9px 0 5px; font-size:1rem; }
+      .step p { margin:0; color:var(--muted); font-size:.9rem; }
+      .cta { margin:50px 0 70px; padding:clamp(30px,6vw,58px); border:1px solid #477b6426; border-radius:25px; background:linear-gradient(130deg,#e8f1eb,#f4f4e7); text-align:center; }
+      .cta p { max-width:560px; margin:13px auto 24px; color:var(--muted); }
+      footer { display:flex; justify-content:space-between; gap:20px; padding:26px 0 34px; border-top:1px solid var(--line); color:var(--muted); font-size:.82rem; }
+      footer p { margin:0; }
+      footer a { color:var(--accent); text-decoration:none; }
+      @media (max-width:760px) { .hero { grid-template-columns:1fr; gap:12px; padding:46px 0 40px; } .hero-copy { text-align:center; } .hero p,.note { margin-right:auto!important; margin-left:auto!important; } .hero-actions { justify-content:center; } .art { min-height:300px; } .orb { width:260px; } .bubble.one { left:5%; } .bubble.two { right:2%; } nav a:not(.button) { display:none; } .cards,.steps { grid-template-columns:1fr; } section.content { padding:48px 0; } footer { flex-direction:column; } }
+      @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*:before,*:after { transition:none!important; } }
     </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#">Mental Health Support</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#features">Features</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#how-it-works">How It Works</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#testimonials">Testimonials</a>
-                    </li>
-                </ul>
-                <div class="d-flex">
-                    <a href="/index" class="btn btn-success me-2">Talk to Chatbot</a>
-                    <a href="/login" class="btn btn-outline-primary me-2">Login</a>
-                    <a href="/register" class="btn btn-primary">Sign Up</a>
-                </div>
-            </div>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+  </head>
+  <body>
+    <header class="wrap">
+      <a class="brand" href="/" aria-label="Aranya home"><span class="mark" aria-hidden="true">✳</span><span>aranya</span></a>
+      <nav aria-label="Main navigation">
+        <a href="#approach">Our approach</a>
+        <a href="#how-it-works">How it works</a>
+        {% include "_theme_toggle.html" %}
+        {% if user %}
+          <a class="button" href="{{ url_for('chat_page') }}">Open your space</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">Sign in</a>
+          <a class="button" href="{{ url_for('register') }}">Create account</a>
+        {% endif %}
+      </nav>
+    </header>
+    <main>
+      <section class="wrap hero">
+        <div class="hero-copy">
+          <span class="eyebrow"><span class="dot"></span>A calmer corner of the internet</span>
+          <h1>A little space to talk.</h1>
+          <p>When things feel like a lot, it can help to put them into words. Aranya offers a gentle place to reflect, find practical coping ideas, and take things one step at a time.</p>
+          <div class="hero-actions">
+            {% if user %}
+              <a class="button" href="{{ url_for('chat_page') }}">Continue to your space</a>
+            {% else %}
+              <a class="button" href="{{ url_for('register') }}">Create your free account</a>
+              <a class="button secondary" href="{{ url_for('login') }}">Sign in</a>
+            {% endif %}
+          </div>
+          <p class="note">Aranya is an AI companion, not a therapist or emergency service. If you may be in immediate danger, contact local emergency help. In India, call TELE-MANAS at <a href="tel:14416">14416</a>.</p>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero pt-5 mt-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1>Your Safe Space for Mental Wellbeing</h1>
-                    <p class="mt-4">Connect with an AI companion designed to provide support, help you develop coping strategies, and guide you toward better mental health, anytime you need it.</p>
-                    <div class="mt-5">
-                        <a href="/index" class="btn btn-success btn-lg me-3">Talk to Chatbot Now</a>
-                        <a href="/register" class="btn btn-primary btn-lg me-3">Get Started</a>
-                        <a href="#how-it-works" class="btn btn-outline-primary btn-lg">Learn More</a>
-                    </div>
-                </div>
-                <div class="col-lg-6 text-center">
-                    <img src="/api/placeholder/500/400" alt="Mental Health Support Illustration" class="img-fluid">
-                </div>
-            </div>
+        <div class="art" aria-hidden="true">
+          <span class="bubble one">You can start wherever you are.</span>
+          <div class="orb"><span class="leaf">✳</span></div>
+          <span class="bubble two">One moment at a time.</span>
         </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="py-5 mt-5">
-        <div class="container">
-            <h2 class="text-center mb-5">How We Can Help</h2>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="card feature-card p-4">
-                        <div class="feature-icon">
-                            <i class="bi bi-chat-dots"></i>
-                        </div>
-                        <h3>24/7 Support</h3>
-                        <p>Access compassionate mental health support whenever you need it, day or night.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card feature-card p-4">
-                        <div class="feature-icon">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <h3>Private & Secure</h3>
-                        <p>Your conversations and personal information are always kept private and secure.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card feature-card p-4">
-                        <div class="feature-icon">
-                            <i class="bi bi-lightbulb"></i>
-                        </div>
-                        <h3>Coping Strategies</h3>
-                        <p>Learn practical techniques to manage stress, anxiety, and improve overall wellbeing.</p>
-                    </div>
-                </div>
-            </div>
+      </section>
+      <section id="approach" class="content">
+        <div class="wrap">
+          <div class="section-head">
+            <span class="eyebrow">A thoughtful place to begin</span>
+            <h2>Support at your own pace.</h2>
+            <p>Share as much or as little as you want. No pressure to have the right words.</p>
+          </div>
+          <div class="cards">
+            <article class="card"><span class="icon" aria-hidden="true">♡</span><h3>A listening space</h3><p>Explore what’s on your mind in a warm, non-judgmental conversation.</p></article>
+            <article class="card"><span class="icon" aria-hidden="true">✦</span><h3>Small, practical steps</h3><p>Try grounding ideas and everyday coping strategies when they feel useful.</p></article>
+            <article class="card"><span class="icon" aria-hidden="true">↺</span><h3>Pick up where you left off</h3><p>Your account keeps your conversation history available for you to revisit.</p></article>
+          </div>
         </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section id="how-it-works" class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-5">How It Works</h2>
-            <div class="row align-items-center">
-                <div class="col-md-6 mb-4">
-                    <img src="/api/placeholder/500/400" alt="How It Works Illustration" class="img-fluid rounded">
-                </div>
-                <div class="col-md-6">
-                    <div class="d-flex mb-4">
-                        <div class="me-3">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">1</div>
-                        </div>
-                        <div>
-                            <h4>Start a Conversation</h4>
-                            <p>Talk directly with our supportive AI companion about whatever is on your mind - no signup required.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-4">
-                        <div class="me-3">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">2</div>
-                        </div>
-                        <div>
-                            <h4>Create Your Account</h4>
-                            <p>Sign up to save your conversations and access personalized support on your wellness journey.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex mb-4">
-                        <div class="me-3">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">3</div>
-                        </div>
-                        <div>
-                            <h4>Receive Support & Guidance</h4>
-                            <p>Get personalized emotional support, coping strategies, and helpful resources.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      </section>
+      <section id="how-it-works" class="content">
+        <div class="wrap">
+          <div class="section-head"><span class="eyebrow">Simple by design</span><h2>Start with one thought.</h2></div>
+          <div class="steps">
+            <article class="step"><b>01 / MAKE IT YOURS</b><h3>Create an account</h3><p>Your saved chats and profile stay linked to your account.</p></article>
+            <article class="step"><b>02 / TAKE A BREATH</b><h3>Talk things through</h3><p>Send a message whenever you want to reflect or ask for ideas.</p></article>
+            <article class="step"><b>03 / KEEP WHAT HELPS</b><h3>Return when you’re ready</h3><p>Revisit past conversations and choose what belongs in your profile.</p></article>
+          </div>
         </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="py-5">
-        <div class="container">
-            <h2 class="text-center mb-5">What Our Users Say</h2>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial">
-                        <p class="testimonial-text">"Having someone to talk to whenever I need has been life-changing. This app helped me through some really difficult times."</p>
-                        <p class="testimonial-author">- Alex P.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial">
-                        <p class="testimonial-text">"I've learned so many helpful techniques for managing my anxiety. The supportive conversations have made a real difference."</p>
-                        <p class="testimonial-author">- Jamie T.</p>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="testimonial">
-                        <p class="testimonial-text">"As someone who finds it hard to open up, this platform gave me a safe space to express my feelings without judgment."</p>
-                        <p class="testimonial-author">- Sam R.</p>
-                    </div>
-                </div>
-            </div>
+      </section>
+      <section class="wrap">
+        <div class="cta">
+          <h2>There’s no perfect place to begin.</h2>
+          <p>Whenever you’re ready, Aranya is here to listen and help you find a next step.</p>
+          {% if user %}
+            <a class="button" href="{{ url_for('chat_page') }}">Open your space</a>
+          {% else %}
+            <a class="button" href="{{ url_for('register') }}">Create a free account</a>
+          {% endif %}
         </div>
-    </section>
-
-    <!-- CTA Section -->
-    <div class="container">
-        <section class="cta-section">
-            <div class="container text-center">
-                <h2>Ready to Start Your Journey?</h2>
-                <p class="mt-3 mb-4">Join thousands of others who have found support and guidance on their path to better mental health.</p>
-                <a href="/index" class="btn btn-light btn-lg me-3">Talk to Chatbot Now</a>
-                <a href="/register" class="btn btn-light btn-lg">Create an Account</a>
-            </div>
-        </section>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5>Mental Health Support</h5>
-                    <p>Your safe space to talk and find support for your mental wellbeing.</p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5>Connect With Us</h5>
-                    <div class="mt-3">
-                        <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-icon"><i class="bi bi-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-4">
-                <p class="text-muted">© 2025 Mental Health Support. All rights reserved.</p>
-            </div>
-        </div>
+      </section>
+    </main>
+    <footer class="wrap">
+      <p>© 2026 Aranya · A supportive AI companion, not a substitute for professional care.</p>
+      <p>In India, call <a href="tel:14416">TELE-MANAS at 14416</a> for mental health support.</p>
     </footer>
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+  </body>
 </html>

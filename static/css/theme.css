@@ -1,0 +1,121 @@
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #131b18;
+  --surface: #1b2521;
+  --surface-muted: #202c27;
+  --text: #e7eee9;
+  --muted: #a0afa6;
+  --line: #2d3a34;
+  --accent: #86b69a;
+  --accent-hover: #9bc7aa;
+  --accent-soft: #293d32;
+  --soft: #293d32;
+  --user-bubble: #2b4235;
+  --bot-bubble: #26312c;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.28), 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+
+:root[data-theme="dark"] body {
+  background:
+    radial-gradient(ellipse at 14% 4%, rgba(54, 89, 68, 0.2), transparent 34rem),
+    radial-gradient(ellipse at 94% 90%, rgba(80, 78, 47, 0.12), transparent 30rem),
+    var(--page);
+  color: var(--text);
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] textarea {
+  border-color: var(--line);
+  background-color: var(--surface-muted);
+  color: var(--text);
+}
+
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .item,
+:root[data-theme="dark"] .chat-card,
+:root[data-theme="dark"] .bubble,
+:root[data-theme="dark"] .account-popover {
+  border-color: var(--line);
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .orb {
+  border-color: var(--line);
+  background: linear-gradient(145deg, #24352b, #2e3426);
+}
+
+:root[data-theme="dark"] .cta {
+  border-color: var(--line);
+  background: linear-gradient(130deg, #24352b, #2e3426);
+}
+
+:root[data-theme="dark"] .notice,
+:root[data-theme="dark"] .flash {
+  background: #293d32;
+  color: #c1dfca;
+}
+
+:root[data-theme="dark"] .notice.error {
+  background: #3c2927;
+  color: #f0c1bb;
+}
+
+:root[data-theme="dark"] .error {
+  border-color: #68413d;
+  background: #3c2927;
+  color: #f0c1bb;
+}
+
+:root[data-theme="dark"] .theme-toggle {
+  color: var(--text);
+}
+
+.theme-toggle {
+  display: inline-grid;
+  width: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  background: var(--surface-muted, var(--surface));
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.theme-toggle .theme-sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle .theme-moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle .theme-sun {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+}
